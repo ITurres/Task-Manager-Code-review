@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,700&family=Poppins:wght@300&display=swap');
+
+$button-background: #fff;
+$button-font-color: #8f8f8f;
+$button-darker-font-color: #555;
+$dark-blue: #090930;
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: $dark-blue;
+}
+
+#header {
+  font-weight: 700;
+  color: $dark-blue;
+}
+
+.task--wrapper {
+  padding: 0;
+
+  @media (min-width: 768px) {
+    width: 60%;
+  }
+}
+
+input[type='text'] {
+  outline: none;
+
+  &::placeholder {
+    font-style: italic;
+  }
+}
+
+input[type='checkbox'] {
+  transition: all 0.2s ease-in-out;
+
+  &:checked {
+    accent-color: #2ecd2e;
+  }
+
+  &:hover {
+    transform: scale(1.2);
+  }
+}
+
+.my-button {
+  background-color: $button-background;
+  color: $button-font-color;
+  border: none;
+  transition: all 0.2s ease-in-out;
+
+  &.clear-all {
+    background-color: #e2e2e2;
+  }
+
+  &.draggable {
+    cursor: move;
+  }
+
+  &.trash:hover {
+    color: #8f2727;
+  }
+
+  &:hover {
+    color: $button-darker-font-color;
+  }
+}
+
+.task-completed {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
