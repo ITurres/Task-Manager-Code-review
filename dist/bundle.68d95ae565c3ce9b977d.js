@@ -16,16 +16,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _markup_templates_create_task_template_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../markup-templates/create-task-template.js */ "./src/js/markup-templates/create-task-template.js");
 
 
-var updateTaskListOnDOM = function updateTaskListOnDOM(updateWhen) {
-  var taskListHolder = document.querySelector('[data-task-list-holder]');
+var taskListHolder = document.querySelector('[data-task-list-holder]');
+var injectFullTaskList = function injectFullTaskList() {
   var taskList = new _user_controller_task_manager_class_js__WEBPACK_IMPORTED_MODULE_0__["default"]().getTaskList();
-  if (updateWhen === 'lastTask') {
-    taskListHolder.innerHTML += (0,_markup_templates_create_task_template_js__WEBPACK_IMPORTED_MODULE_1__["default"])(taskList[taskList.length - 1]);
-  } else if (updateWhen === 'fullList') {
-    taskList.forEach(function (task) {
-      taskListHolder.innerHTML += (0,_markup_templates_create_task_template_js__WEBPACK_IMPORTED_MODULE_1__["default"])(task);
-    });
-  }
+  taskList.forEach(function (task) {
+    taskListHolder.innerHTML += (0,_markup_templates_create_task_template_js__WEBPACK_IMPORTED_MODULE_1__["default"])(task);
+  });
+};
+var injectLastTask = function injectLastTask() {
+  var taskList = new _user_controller_task_manager_class_js__WEBPACK_IMPORTED_MODULE_0__["default"]().getTaskList();
+  taskListHolder.innerHTML += (0,_markup_templates_create_task_template_js__WEBPACK_IMPORTED_MODULE_1__["default"])(taskList[taskList.length - 1]);
+};
+var updateTaskListOnDOM = {
+  injectFullTaskList: injectFullTaskList,
+  injectLastTask: injectLastTask
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (updateTaskListOnDOM);
 
@@ -148,12 +152,15 @@ __webpack_require__.r(__webpack_exports__);
 
 
 if (window.localStorage.length > 0) {
-  (0,_markup_injectors_update_tasklist_dom_injection_js__WEBPACK_IMPORTED_MODULE_1__["default"])('fullList');
+  _markup_injectors_update_tasklist_dom_injection_js__WEBPACK_IMPORTED_MODULE_1__["default"].injectFullTaskList();
   (0,_utils_updateCompletedTaskStyles_js__WEBPACK_IMPORTED_MODULE_3__["default"])();
 }
 document.querySelector('[data-refresh-btn]').addEventListener('click', function () {
   window.location.reload();
 });
+
+// * START of [Add New Task]
+
 document.querySelector('[data-add-task]').addEventListener('click', function () {
   var taskData = document.querySelector('[name="new-task"]');
   if (!taskData.value) {
@@ -163,25 +170,35 @@ document.querySelector('[data-add-task]').addEventListener('click', function () 
   taskList.addNewTask({
     description: taskData.value
   });
-  (0,_markup_injectors_update_tasklist_dom_injection_js__WEBPACK_IMPORTED_MODULE_1__["default"])('lastTask');
+  _markup_injectors_update_tasklist_dom_injection_js__WEBPACK_IMPORTED_MODULE_1__["default"].injectLastTask();
   window.location.reload();
 });
+
+// * START of [Task Edition]
+
 document.querySelectorAll('[data-task]').forEach(function (taskInput) {
   taskInput.addEventListener('click', function () {
     taskInput.readOnly = false;
+    taskInput.style.background = '#2ecd2e32';
   });
-  document.addEventListener('mouseleave', function (event) {
-    // ? update data => when mouse leaves input element
+  taskInput.addEventListener('keyup', function () {
+    var parentDiv = (0,_utils_get_parent_element_id_js__WEBPACK_IMPORTED_MODULE_2__["default"])(taskInput, 'div');
+    var taskList = new _task_manager_class_js__WEBPACK_IMPORTED_MODULE_0__["default"]();
+    taskList.updateTask({
+      index: parentDiv.id,
+      description: taskInput.value
+    });
+  });
+  document.addEventListener('click', function (event) {
     if (!taskInput.contains(event.target)) {
-      var parentDiv = (0,_utils_get_parent_element_id_js__WEBPACK_IMPORTED_MODULE_2__["default"])(taskInput, 'div');
-      var taskList = new _task_manager_class_js__WEBPACK_IMPORTED_MODULE_0__["default"]();
-      taskList.updateTask({
-        index: parentDiv.id,
-        description: taskInput.value
-      });
+      // ? user has clicked outside input
+      taskInput.style.background = 'transparent';
     }
   });
 });
+
+// * START of [Task Checked]
+
 document.querySelectorAll('[data-task-checkbox]').forEach(function (checkbox) {
   checkbox.addEventListener('change', function (event) {
     var taskCompleted = JSON.parse(event.target.dataset.completed);
@@ -195,6 +212,9 @@ document.querySelectorAll('[data-task-checkbox]').forEach(function (checkbox) {
     window.location.reload();
   });
 });
+
+// * START of [Task Single Deletion]
+
 document.querySelectorAll('[data-delete-task]').forEach(function (button) {
   button.addEventListener('click', function () {
     var parentDiv = (0,_utils_get_parent_element_id_js__WEBPACK_IMPORTED_MODULE_2__["default"])(button, 'div');
@@ -203,6 +223,9 @@ document.querySelectorAll('[data-delete-task]').forEach(function (button) {
     window.location.reload();
   });
 });
+
+// * START of [Task Multiple Deletion]
+
 document.querySelector('[data-clear-all-btn]').addEventListener('click', function () {
   var taskList = new _task_manager_class_js__WEBPACK_IMPORTED_MODULE_0__["default"]();
   taskList.removeCompletedTasks();
@@ -331,7 +354,7 @@ input[type=checkbox]:hover {
 .task-completed {
   text-decoration: line-through;
   opacity: 0.5;
-}`, "",{"version":3,"sources":["webpack://./src/styles/index.scss"],"names":[],"mappings":"AAOA;EACE,kCAAA;EACA,yBAJU;AADZ;;AAQA;EACE,gBAAA;EACA,cATU;AAIZ;;AAQA;EACE,UAAA;AALF;AAOE;EAHF;IAII,UAAA;EAJF;AACF;;AAOA;EACE,aAAA;AAJF;AAME;EACE,kBAAA;AAJJ;;AAQA;EACE,gCAAA;AALF;AAOE;EACE,qBAAA;AALJ;AAQE;EACE,qBAAA;AANJ;;AAUA;EACE,sBA5CkB;EA6ClB,cA5CkB;EA6ClB,YAAA;EACA,gCAAA;AAPF;AASE;EACE,yBAAA;AAPJ;AAUE;EACE,YAAA;AARJ;AAWE;EACE,cAAA;AATJ;AAYE;EACE,WA5DuB;AAkD3B;;AAcA;EACE,6BAAA;EACA,YAAA;AAXF","sourcesContent":["@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,700&family=Poppins:wght@300&display=swap');\n\n$button-background: #fff;\n$button-font-color: #8f8f8f;\n$button-darker-font-color: #555;\n$dark-blue: #090930;\n\nbody {\n  font-family: 'Poppins', sans-serif;\n  background-color: $dark-blue;\n}\n\n#header {\n  font-weight: 700;\n  color: $dark-blue;\n}\n\n.task--wrapper {\n  padding: 0;\n\n  @media (min-width: 768px) {\n    width: 60%;\n  }\n}\n\ninput[type='text'] {\n  outline: none;\n\n  &::placeholder {\n    font-style: italic;\n  }\n}\n\ninput[type='checkbox'] {\n  transition: all 0.2s ease-in-out;\n\n  &:checked {\n    accent-color: #2ecd2e;\n  }\n\n  &:hover {\n    transform: scale(1.2);\n  }\n}\n\n.my-button {\n  background-color: $button-background;\n  color: $button-font-color;\n  border: none;\n  transition: all 0.2s ease-in-out;\n\n  &.clear-all {\n    background-color: #e2e2e2;\n  }\n\n  &.draggable {\n    cursor: move;\n  }\n\n  &.trash:hover {\n    color: #8f2727;\n  }\n\n  &:hover {\n    color: $button-darker-font-color;\n  }\n}\n\n.task-completed {\n  text-decoration: line-through;\n  opacity: 0.5;\n}\n"],"sourceRoot":""}]);
+}`, "",{"version":3,"sources":["webpack://./src/styles/index.scss"],"names":[],"mappings":"AAOA;EACE,kCAAA;EACA,yBAJU;AADZ;;AAQA;EACE,gBAAA;EACA,cATU;AAIZ;;AAQA;EACE,UAAA;AALF;AAOE;EAHF;IAII,UAAA;EAJF;AACF;;AAOA;EACE,aAAA;AAJF;AAME;EACE,kBAAA;AAJJ;;AAQA;EACE,gCAAA;AALF;AAOE;EACE,qBAAA;AALJ;AAQE;EACE,qBAAA;AANJ;;AAUA;EACE,sBA5CkB;EA6ClB,cA5CkB;EA6ClB,YAAA;EACA,gCAAA;AAPF;AASE;EACE,yBAAA;AAPJ;AAUE;EACE,YAAA;AARJ;AAWE;EACE,cAAA;AATJ;AAYE;EACE,WA5DuB;AAkD3B;;AAcA;EACE,6BAAA;EACA,YAAA;AAXF","sourcesContent":["@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,700&family=Poppins:wght@300&display=swap');\r\n\r\n$button-background: #fff;\r\n$button-font-color: #8f8f8f;\r\n$button-darker-font-color: #555;\r\n$dark-blue: #090930;\r\n\r\nbody {\r\n  font-family: 'Poppins', sans-serif;\r\n  background-color: $dark-blue;\r\n}\r\n\r\n#header {\r\n  font-weight: 700;\r\n  color: $dark-blue;\r\n}\r\n\r\n.task--wrapper {\r\n  padding: 0;\r\n\r\n  @media (min-width: 768px) {\r\n    width: 60%;\r\n  }\r\n}\r\n\r\ninput[type='text'] {\r\n  outline: none;\r\n\r\n  &::placeholder {\r\n    font-style: italic;\r\n  }\r\n}\r\n\r\ninput[type='checkbox'] {\r\n  transition: all 0.2s ease-in-out;\r\n\r\n  &:checked {\r\n    accent-color: #2ecd2e;\r\n  }\r\n\r\n  &:hover {\r\n    transform: scale(1.2);\r\n  }\r\n}\r\n\r\n.my-button {\r\n  background-color: $button-background;\r\n  color: $button-font-color;\r\n  border: none;\r\n  transition: all 0.2s ease-in-out;\r\n\r\n  &.clear-all {\r\n    background-color: #e2e2e2;\r\n  }\r\n\r\n  &.draggable {\r\n    cursor: move;\r\n  }\r\n\r\n  &.trash:hover {\r\n    color: #8f2727;\r\n  }\r\n\r\n  &:hover {\r\n    color: $button-darker-font-color;\r\n  }\r\n}\r\n\r\n.task-completed {\r\n  text-decoration: line-through;\r\n  opacity: 0.5;\r\n}\r\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -866,4 +889,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
-//# sourceMappingURL=bundle.2c4b2b43c5da38936f69.js.map
+//# sourceMappingURL=bundle.68d95ae565c3ce9b977d.js.map
